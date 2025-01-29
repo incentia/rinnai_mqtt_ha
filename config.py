@@ -8,7 +8,7 @@ load_dotenv()
 class Config:
     # Rinnai MQTT settings
     RINNAI_HTTP_USERNAME = os.getenv('RINNAI_USERNAME')
-    RINNAI_HOST = os.getenv('RINNAI_HOST', 'mqtt.rinnai.com.cn')
+    RINNAI_HOST = os.getenv('RINNAI_HOST', 'iot.rinnai.com.cn')
     RINNAI_PORT = int(os.getenv('RINNAI_PORT', '8883'))
     RINNAI_USERNAME = f"a:rinnai:SR:01:SR:{os.getenv('RINNAI_USERNAME')}"
     RINNAI_PASSWORD = str.upper(
