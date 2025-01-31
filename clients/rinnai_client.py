@@ -1,6 +1,8 @@
 import ssl
 import json
 import logging
+import utils.constants as const
+import time
 from .mqtt_client import MQTTClientBase
 from processors.message_processor import MessageProcessor
 
@@ -40,47 +42,75 @@ class RinnaiClient(MQTTClientBase):
         except Exception as e:
             logging.error(f"Rinnai message error: {e}")
 
+
+    def set_temperature_1(self, data = "00"):
+        
+        heat_type = "hotWaterTempOperate"
+        request_payload = {
+            "code": self.config.AUTH_CODE,
+            "id": self.config.DEVICE_TYPE,
+            "ptn": "J00",
+            "enl": [
+                {
+                    "id": heat_type,
+                    "data": data,
+                }
+            ],
+
+            "sum": "1"
+        }
+        self.publish(self.topics["set"], json.dumps(request_payload), qos=1)
+        logging.info(f"Set {heat_type} temperature with {data}°C")
+
     def set_temperature(self, heat_type, temperature):
         if not heat_type:
             raise ValueError("Error: heat type not specified")
 
-        request_payload = {
-            "code": self.config.AUTH_CODE,
-            "enl": [
-                {
-                    "data": hex(temperature)[2:].upper().zfill(2),
-                    "id": heat_type
-                }
-            ],
-            "id": self.config.DEVICE_TYPE,
-            "ptn": "J00",
-            "sum": "1"
-        }
-        self.publish(self.topics["set"], json.dumps(request_payload), qos=1)
+        data_value = "00"
+        
+        if (temperature > const.CURRENT_HOTWATER_TEMP):
+            data_value = "01"
+            
+        cnt = 0
+        while (temperature != const.CURRENT_HOTWATER_TEMP):
+            if (cnt > 0):
+                break
+            self.set_temperature_1(data_value);
+            time.sleep(1)
+            cnt = cnt + 1
+
         logging.info(f"Set {heat_type} temperature to {temperature}°C")
 
-    def set_mode(self, mode):
+
+   
+    def set_mode(self, mode, status="ON"):
         if not mode:
             raise ValueError("Error: mode not specified")
 
+        data_value = "00"
+        if "ON" in status:
+            data_value = "01"
+            
         request_payload = {
             "code": self.config.AUTH_CODE,
+            "id": self.config.DEVICE_TYPE,
+            "ptn": "J00", 
             "enl": [
                 {
-                    "data": "31",
+                    "data": data_value,
                     "id": mode
                 }
             ],
-            "id": self.config.DEVICE_TYPE,
-            "ptn": "J00",
+                      
             "sum": "1"
         }
         self.publish(self.topics["set"], json.dumps(request_payload), qos=1)
-        logging.info(f"Set mode to: {mode}")
 
     def set_default_status(self):
         default_status = {'enl': []}
         for key, value in self.config.INIT_STATUS.items():
             default_status['enl'].append({'id': key, 'data': value})
+            if "hotWaterTempSetting" in key:
+                const.CURRENT_HOTWATER_TEMP = int(value, 16)
         self.message_processor._process_device_info(default_status)
         self.message_processor.notify_observers()
