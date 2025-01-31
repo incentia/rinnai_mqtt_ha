@@ -21,6 +21,16 @@ OPERATION_MODES = {
     
 }
 
+USEABLE = {
+    "0": "不可用",
+    "1": "可用"
+}
+
+COMPLETE_CONFIRM = {
+    "0": "未完成",
+    "1": "完成"
+}
+
 CYCLE_MODE = {
     "0": "标准循环",
     "1": "舒适循环",
@@ -65,7 +75,15 @@ STATE_PARAMETERS = {
     'temporaryCycleInsulationSetting',
     'childLock',
     'priority',
-    'cycleModeSetting'
+    'cycleModeSetting',
+    'cycleReservationTimeSetting',
+    'bathWaterInjectionSetting',
+    'waterInjectionStatus',
+    'remainingWater',
+    'waterInjectionCompleteConfirm',
+    'hotWaterUseableSign',
+    'faucetNotCloseSign',
+    'errorCode'
     }
 
 CURRENT_HOTWATER_TEMP = 39
