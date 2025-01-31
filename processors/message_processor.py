@@ -68,6 +68,37 @@ class MessageProcessor:
         cycleReservationSetting_mapping = const.SWITCH_STATUS
         return cycleReservationSetting_mapping.get(status, f"invalid ({status})")
 
+    def _get_cycleReservationTimeSetting(self, status: str) -> str:
+        result = status.split();
+        status_inv = ""
+        for tmp in result:
+            status_inv = tmp + status_inv
+            
+        #logging.info(f"MG {status} vs {status_inv}")
+
+        #bin_str = format(int(status_inv, 16), '016b')
+            
+        #logging.info(f"MG {status} vs {bin_str}")
+
+        return (status_inv)
+
+    def _get_waterInjectionCompleteConfirm(self, status: str) -> str:
+        waterInjectionCompleteConfirm_mapping = const.COMPLETE_CONFIRM
+        return waterInjectionCompleteConfirm_mapping.get(status, f"invalid ({status})")
+
+    def _get_hotWaterUseableSign(self, status: str) -> str:
+        hotWaterUseableSign_mapping = const.USEABLE
+        return hotWaterUseableSign_mapping.get(status, f"invalid ({status})")
+
+    def _get_faucetNotCloseSign(self, status: str) -> str:
+        faucetNotCloseSign_mapping = const.SWITCH_STATUS
+        return faucetNotCloseSign_mapping.get(status, f"invalid ({status})")
+
+    def _get_errorCode(self, status: str) -> str:
+        #faucetNotCloseSign_mapping = const.SWITCH_STATUS
+        #return faucetNotCloseSign_mapping.get(status, f"invalid ({status})")
+        return (status)
+
     def _process_device_info(self, parsed_data: Dict[str, Any]) -> None:
         """Process device information from parsed message."""
         state_mapping = {
@@ -82,7 +113,15 @@ class MessageProcessor:
             'childLock': self._get_childLock,
             'priority' : self._get_priority,
             'cycleModeSetting': self._get_cycleModeSetting,
-            'cycleReservationSetting': self._get_cycleReservationSetting
+            'cycleReservationSetting': self._get_cycleReservationSetting,
+            'cycleReservationTimeSetting': self._get_cycleReservationTimeSetting,
+            'bathWaterInjectionSetting': lambda x: self._process_hex_value(x, 'bathWaterInjectionSetting'),
+            'waterInjectionStatus': lambda x: self._process_hex_value(x, 'waterInjectionStatus'),
+            'remainingWater': lambda x: self._process_hex_value(x, 'remainingWater'),
+            'waterInjectionCompleteConfirm': self._get_waterInjectionCompleteConfirm,
+            'hotWaterUseableSign': self._get_hotWaterUseableSign,
+            'faucetNotCloseSign': self._get_faucetNotCloseSign,
+            'errorCode': self._get_errorCode
         }
 
         for param in parsed_data.get('enl', []):
