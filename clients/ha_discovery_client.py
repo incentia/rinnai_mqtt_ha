@@ -114,23 +114,30 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
 
         # 传感器配置
         sensors = [
-            ("模式", "operationMode", None),
-            ("燃烧状态", "burningState", None),
-            ("热水温度", "hotWaterTempSetting", "°C"),
+            ("热水模式", "operationMode", None),
+            ("燃烧器状态", "burningState", None),
+            ("当前水温设定", "hotWaterTempSetting", "°C"),
             ("耗气量", "gasConsumption", "m³"),
             ("一键循环","temporaryCycleInsulationSetting", None),
             ("优先键","priority", None),
             ("儿童锁","childLock", None),
             ("循环模式","cycleModeSetting", None),
             ("网络状态","online", None),
-            ("预约循环","cycleReservationSetting", None)
+            ("预约循环","cycleReservationSetting", None),
+            ("预约循环时间","cycleReservationTimeSetting", None),
+            ("浴缸注水量设定", "bathWaterInjectionSetting", "L"),
+            ("浴缸注水", "waterInjectionStatus", "L"),
+            ("浴缸剩余注水量", "remainingWater", "L"),
+            ("浴缸注水完成", "waterInjectionCompleteConfirm", None),
+            ("热水可用", "hotWaterUseableSign", None),
+            ("龙头未关", "faucetNotCloseSign", None),
+            ("错误代码", "errorCode", None)
         ]
-
         for label, object_id, unit in sensors:
             topic, config = self.generate_config(
                 'sensor',
                 object_id,
-                f"Rinnai {label}",
+                f"{label}",
                 None,
                 'sensor',
                 unit
@@ -147,7 +154,7 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
             number_topic, number_config = self.generate_config(
                 'number',
                 object_id,
-                f"Rinnai {label}",
+                f"{label}",
                 topic,
                 'number'
             )
@@ -163,7 +170,7 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
             switch_topic, switch_config = self.generate_config(
                 'switch',
                 object_id,
-                f"Rinnai {label}",
+                f"{label}",
                 topic,
                 'switch'
             )
