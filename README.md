@@ -53,7 +53,7 @@ docker run -d \
 version: "3.8"
 services:
   rinnai_mqtt:
-    image: ghcr.io/palafin02back/rinnai_mqtt_ha:release
+    image: ghcr.io/incentia/rinnai_mqtt_ha:release
     restart: always
     environment:
       - RINNAI_USERNAME=yourphone
