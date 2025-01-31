@@ -27,13 +27,15 @@ class Config:
     LOGGING = os.getenv('LOCAL_MQTT_TLS', 'False').lower() == 'true'
 
 
+
     # Topic structures
     @classmethod
     def get_rinnai_topics(cls):
         return {
+            "sys": f"rinnai/SR/01/SR/{cls.DEVICE_SN}/sys/",
+            "res": f"rinnai/SR/01/SR/{cls.DEVICE_SN}/res/",
             "inf": f"rinnai/SR/01/SR/{cls.DEVICE_SN}/inf/",
-            "stg": f"rinnai/SR/01/SR/{cls.DEVICE_SN}/stg/",
-            "set": f"rinnai/SR/01/SR/{cls.DEVICE_SN}/set/"
+            "set": f"rinnai/SR/01/SR/{cls.DEVICE_SN}/set/"            
         }
 
     @classmethod
@@ -59,11 +61,14 @@ class Config:
             "hotWaterTempSetting": "local_mqtt/rinnai/set/temp/hotWaterTempSetting",
             "heatingTempSettingNM": "local_mqtt/rinnai/set/temp/heatingTempSettingNM",
             "heatingTempSettingHES": "local_mqtt/rinnai/set/temp/heatingTempSettingHES",
-            "energySavingMode": "local_mqtt/rinnai/set/mode/energySavingMode",
-            "outdoorMode": "local_mqtt/rinnai/set/mode/outdoorMode",
-            "rapidHeating": "local_mqtt/rinnai/set/mode/rapidHeating",
-            "summerWinter": "local_mqtt/rinnai/set/mode/summerWinter",
+            #"energySavingMode": "local_mqtt/rinnai/set/mode/energySavingMode",
+            #"outdoorMode": "local_mqtt/rinnai/set/mode/outdoorMode",
+            #"rapidHeating": "local_mqtt/rinnai/set/mode/rapidHeating",
+            #"summerWinter": "local_mqtt/rinnai/set/mode/summerWinter",
             "state": "local_mqtt/rinnai/state",
             "gas": "local_mqtt/rinnai/usage/gas",
-            "supplyTime": "local_mqtt/rinnai/usage/supplyTime"
+            "supplyTime": "local_mqtt/rinnai/usage/supplyTime",
+            "power": "local_mqtt/rinnai/set/mode/power",
+            "temporaryCycleInsulationSetting": "local_mqtt/rinnai/set/mode/temporaryCycleInsulationSetting"
+            
         }
