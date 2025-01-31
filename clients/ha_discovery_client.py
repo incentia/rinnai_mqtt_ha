@@ -47,7 +47,7 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
                 "identifiers": [self.unique_id],
                 "name": "Rinnai Heater",
                 "manufacturer": "Rinnai",
-                "model": "G56"
+                "model": "RUS-R**E86"
             }
         }
         # 添加单位
@@ -98,24 +98,10 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
 
 
     def get_switch_value_template(self, object_id):
-        """
-        根据 object_id 返回对应的 value_template，用于解析 switch 的状态
-        """
-        # 定义模式对应的 operationMode 值集合
-        mode_codes = {
-            "energySavingMode": ["采暖节能", "快速采暖/节能"],
-            "outdoorMode": ["采暖外出", "快速采暖/外出"],
-            "rapidHeating": ["快速采暖", "快速采暖/节能", "快速采暖/外出", "快速采暖/预约"],
-        }
-
-        if object_id == "summerWinter":
-            # 对于采暖开关，operationMode 为 '0', '1', '2' 时为 OFF，其它为 ON
-            return "{% if value_json.operationMode in ['关机', '采暖关闭', '休眠'] %}OFF{% else %}ON{% endif %}"
+        if object_id == "power":
+            return "{% if value_json.operationMode in ['关机'] %}OFF{% else %}ON{% endif %}"
         else:
-            codes = mode_codes.get(object_id, [])
-            # 构建用于判断的模板字符串
-            codes_string = ','.join(f"'{code}'" for code in codes)
-            return f"{{% if value_json.operationMode in [{codes_string}] %}}ON{{% else %}}OFF{{% endif %}}"
+            return "{% if value_json.temporaryCycleInsulationSetting in ['关'] %}OFF{% else %}ON{% endif %}"
 
 
 
@@ -128,20 +114,16 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
 
         # 传感器配置
         sensors = [
-            # ("室温控制", "roomTempControl", "°C"),
-            # ("出水温度", "heatingOutWaterTempControl", "°C"),
             ("模式", "operationMode", None),
             ("燃烧状态", "burningState", None),
             ("热水温度", "hotWaterTempSetting", "°C"),
-            ("锅炉温度", "heatingTempSettingNM", "°C"),
-            ("锅炉温度/节能", "heatingTempSettingHES", "°C"),
             ("耗气量", "gasConsumption", "m³"),
-            ("供电时间", "supplyTime/totalPowerSupplyTime", "h"),
-            ("使用时间", "supplyTime/actualUseTime", "h"),
-            ("燃烧时间", "supplyTime/totalHeatingBurningTime", "h"),
-            ("地暖燃烧次数", "supplyTime/heatingBurningTimes", "次"),
-            ("热水燃烧次数", "supplyTime/hotWaterBurningTimes", "次")
-
+            ("一键循环","temporaryCycleInsulationSetting", None),
+            ("优先键","priority", None),
+            ("儿童锁","childLock", None),
+            ("循环模式","cycleModeSetting", None),
+            ("网络状态","online", None),
+            ("预约循环","cycleReservationSetting", None)
         ]
 
         for label, object_id, unit in sensors:
@@ -157,9 +139,7 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
 
         #温度控制
         temp_controls = [
-            ("热水温度", "hotWaterTempSetting",self.config.get_local_topics().get("hotWaterTempSetting")),
-            ("锅炉温度", "heatingTempSettingNM",self.config.get_local_topics().get("heatingTempSettingNM")),
-            ("锅炉温度/节能", "heatingTempSettingHES",self.config.get_local_topics().get("heatingTempSettingHES"))
+            ("热水温度", "hotWaterTempSetting",self.config.get_local_topics().get("hotWaterTempSetting"))
         ]
 
 
@@ -175,10 +155,8 @@ class RinnaiHomeAssistantDiscovery(MQTTClientBase):
 
         # 模式控制
         mode_controls = [
-            ("节能模式", "energySavingMode", self.config.get_local_topics().get("energySavingMode")),
-            ("外出模式", "outdoorMode", self.config.get_local_topics().get("outdoorMode")),
-            ("快速采暖", "rapidHeating", self.config.get_local_topics().get("rapidHeating")),
-            ("采暖开关", "summerWinter", self.config.get_local_topics().get("summerWinter"))
+            ("热水器开关", "power", self.config.get_local_topics().get("power")),
+            ("一键循环", "temporaryCycleInsulationSetting", self.config.get_local_topics().get("temporaryCycleInsulationSetting"))
         ]
 
         for label, object_id, topic in mode_controls:
