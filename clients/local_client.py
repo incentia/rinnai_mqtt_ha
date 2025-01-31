@@ -47,7 +47,8 @@ class LocalClient(MQTTClientBase, DeviceDataObserver):
                 self.rinnai_client.set_temperature(heat_type, temperature)
             elif action == 'mode':
                 mode = msg.topic.split('/')[-1]
-                self.rinnai_client.set_mode(mode)
+                status = msg.payload.decode();
+                self.rinnai_client.set_mode(mode,status)
         except Exception as e:
             logging.error(f"Local MQTT set failed: {e}")
 
