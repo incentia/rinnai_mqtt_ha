@@ -28,6 +28,8 @@ class MessageProcessor:
     def _process_hex_value(self, value: str, param_name: str) -> str:
         """Convert hex value to decimal string."""
         try:
+            if "hotWaterTempSetting" in param_name:
+              const.CURRENT_HOTWATER_TEMP = int(value, 16)
             return str(int(value, 16))
         except ValueError as e:
             logging.warning(f"Invalid hex value for {param_name}: {value}")
@@ -42,6 +44,30 @@ class MessageProcessor:
         state_mapping = const.BURNING_STATES
         return state_mapping.get(state_code, f"invalid ({state_code})")
 
+    def _get_online_status(self, status: str) -> str:
+        online_status_mapping = const.ONLINE_STATUS
+        return online_status_mapping.get(status, f"invalid ({status})")
+
+    def _get_temporaryCycleInsulationSetting(self, status: str) -> str:
+        temporaryCycleInsulationSetting_mapping = const.SWITCH_STATUS
+        return temporaryCycleInsulationSetting_mapping.get(status, f"invalid ({status})")
+
+    def _get_childLock(self, status: str) -> str:
+        childLock_mapping = const.SWITCH_STATUS
+        return childLock_mapping.get(status, f"invalid ({status})")
+
+    def _get_priority(self, status: str) -> str:
+        priority_mapping = const.SWITCH_STATUS
+        return priority_mapping.get(status, f"invalid ({status})")
+
+    def _get_cycleModeSetting(self, status: str) -> str:
+        cycleModeSetting_mapping = const.CYCLE_MODE
+        return cycleModeSetting_mapping.get(status, f"invalid ({status})")
+
+    def _get_cycleReservationSetting(self, status: str) -> str:
+        cycleReservationSetting_mapping = const.SWITCH_STATUS
+        return cycleReservationSetting_mapping.get(status, f"invalid ({status})")
+
     def _process_device_info(self, parsed_data: Dict[str, Any]) -> None:
         """Process device information from parsed message."""
         state_mapping = {
@@ -51,7 +77,12 @@ class MessageProcessor:
             'burningState': self._get_burning_state,
             'hotWaterTempSetting': lambda x: self._process_hex_value(x, 'hotWaterTempSetting'),
             'heatingTempSettingNM': lambda x: self._process_hex_value(x, 'heatingTempSettingNM'),
-            'heatingTempSettingHES': lambda x: self._process_hex_value(x, 'heatingTempSettingHES')
+            'heatingTempSettingHES': lambda x: self._process_hex_value(x, 'heatingTempSettingHES'),
+            'temporaryCycleInsulationSetting': self._get_temporaryCycleInsulationSetting,
+            'childLock': self._get_childLock,
+            'priority' : self._get_priority,
+            'cycleModeSetting': self._get_cycleModeSetting,
+            'cycleReservationSetting': self._get_cycleReservationSetting
         }
 
         for param in parsed_data.get('enl', []):
@@ -68,6 +99,7 @@ class MessageProcessor:
 
             except Exception as e:
                 logging.error(f"Error processing parameter {param_id}: {e}")
+
 
     def _process_energy_data(self, parsed_data: Dict[str, Any]) -> None:
         """Process energy consumption data."""
@@ -105,13 +137,18 @@ class MessageProcessor:
                 logging.warning("Received invalid or empty message")
                 return
 
-            if (parsed_topic == 'inf' and
+            if (parsed_topic == 'sys' and
+                    parsed_data.get('ptn') == "JA3"):
+                self.device_data["state"]['online'] = self._get_online_status(parsed_data.get('online'))
+                self.notify_observers()  # Notify observers after processing device info
+
+            if (parsed_topic == 'res' and
                 parsed_data.get('enl') and
                     parsed_data.get('code') == "FFFF"):
                 self._process_device_info(parsed_data)
                 self.notify_observers()  # Notify observers after processing device info
 
-            elif (parsed_topic == 'stg' and
+            elif (parsed_topic == 'inf' and
                     parsed_data.get('egy') and
                     parsed_data.get('ptn') == "J05"):
                 self._process_energy_data(parsed_data)
