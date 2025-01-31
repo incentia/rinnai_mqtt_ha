@@ -79,4 +79,5 @@ services:
 
 Home Assistant 中 MQTT 可以自行发现：
 
-![image](https://github.com/user-attachments/assets/4ec03ab1-56ab-4574-9f59-13eea7ad464c)
+
+<img width="1009" alt="Screen Shot 2025-01-31 at 17 14 11" src="https://github.com/user-attachments/assets/0a6dc098-0501-41eb-9f27-03f30ec03e6e" />
