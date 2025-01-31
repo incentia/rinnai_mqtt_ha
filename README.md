@@ -44,8 +44,8 @@ docker run -d \
   -e LOCAL_MQTT_PASSWORD=test \
   -e LOCAL_MQTT_TLS=False \
   -e LOGGING=True \
-  ghcr.io/palafin02back/rinnai_mqtt_ha:release
-```
+  ghcr.io/incentia/rinnai_mqtt_ha:release
+
 
 ### Docker Compose
 
