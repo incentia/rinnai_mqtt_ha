@@ -44,7 +44,7 @@ docker run -d \
   -e LOCAL_MQTT_PASSWORD=test \
   -e LOCAL_MQTT_TLS=False \
   -e LOGGING=True \
-  ghcr.io/incentia/rinnai_mqtt_ha:release
+  incentia77/rinnai_mqtt_ha:release
 
 
 ### Docker Compose
@@ -53,7 +53,7 @@ docker run -d \
 version: "3.8"
 services:
   rinnai_mqtt:
-    image: ghcr.io/incentia/rinnai_mqtt_ha:release
+    image: incentia77/rinnai_mqtt_ha:release
     restart: always
     environment:
       - RINNAI_USERNAME=yourphone
